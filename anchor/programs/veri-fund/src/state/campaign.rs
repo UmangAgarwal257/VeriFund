@@ -20,3 +20,9 @@ pub struct Campaign {
     pub balance: u64,
     pub is_active: bool,
 }
+
+impl Campaign {
+    pub const TITLE_MAX_LEN: usize = 64;
+    pub const DESCRIPTION_MAX_LEN: usize = 512;
+    pub const IMAGE_URL_MAX_LEN: usize = 256;
+}
