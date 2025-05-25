@@ -45,7 +45,6 @@ pub fn create_campaign(
 
     let timestamp = Clock::get()?.unix_timestamp;
     let deadline = timestamp + (30 * 24 * 60 * 60); // 30 days from now
-    program_state.campaign_count += 1;
 
     campaign.cid = program_state.campaign_count;
     campaign.creator = creator.key();
@@ -60,6 +59,8 @@ pub fn create_campaign(
     campaign.donors = 0;
     campaign.balance = 0;
     campaign.is_active = true;
+
+    program_state.campaign_count += 1;
 
     Ok(())
 }
