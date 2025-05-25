@@ -21,10 +21,10 @@ pub struct WithdrawFunds<'info> {
         payer = creator,
         space = 8 + Transaction::INIT_SPACE,
         seeds = [
-            b"withdrawal",
+            b"withdraw",
             creator.key().as_ref(),
             cid.to_le_bytes().as_ref(),
-            Clock::get()?.unix_timestamp.to_le_bytes().as_ref()
+            campaign.withdrawals_total.to_le_bytes().as_ref()
         ],
         bump,
     )]
@@ -33,6 +33,7 @@ pub struct WithdrawFunds<'info> {
     #[account(mut)]
     pub program_state: Account<'info, ProgramState>,
 
+    /// CHECK: Platform address for fee collection
     #[account(mut)]
     pub platform_address: AccountInfo<'info>,
 
