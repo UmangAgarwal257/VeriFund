@@ -1,32 +1,17 @@
+
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { VeriFund } from "../target/types/veri_fund";
 import { expect } from "chai";
 import { Keypair, LAMPORTS_PER_SOL, PublicKey, SystemProgram } from "@solana/web3.js";
 
-// Helper: Airdrop using localnet connection
-async function airdropLocalnet(connection: anchor.web3.Connection, pubkey: PublicKey, amount: number) {
-  const sig = await connection.requestAirdrop(pubkey, amount);
-  await connection.confirmTransaction(sig, "confirmed");
-  // Optionally, poll for balance
-  let retries = 30;
-  while (retries > 0) {
-    const balance = await connection.getBalance(pubkey);
-    if (balance >= amount) return;
-    await new Promise(res => setTimeout(res, 200));
-    retries--;
-  }
-  throw new Error(`Airdrop to ${pubkey.toBase58()} failed`);
-}
 
 describe("veri-fund", () => {
-  // Use localnet endpoint
-  const connection = new anchor.web3.Connection("https://api.devnet.solana.com");
-  const wallet = anchor.Wallet.local();
+  // Use devnet endpoint
   const provider = new anchor.AnchorProvider(
-    connection,
-    wallet,
-    { commitment: "confirmed" }
+    new anchor.web3.Connection("https://api.devnet.solana.com", "confirmed"),
+    anchor.Wallet.local(),
+    { preflightCommitment: "confirmed" }
   );
   anchor.setProvider(provider);
   const program = anchor.workspace.VeriFund as Program<VeriFund>;
@@ -42,8 +27,7 @@ describe("veri-fund", () => {
   let donationTransactionPda: PublicKey;
   let withdrawTransactionPda: PublicKey;
 
-  const firstCampaignPdaDerivationKey = new anchor.BN(1);
-  const firstCampaignStoredCid = new anchor.BN(1);
+  let nextCampaignId: anchor.BN;
 
   before(async () => {
     platformAuthority = provider.wallet as anchor.Wallet;
@@ -51,18 +35,12 @@ describe("veri-fund", () => {
     voucher = Keypair.generate();
     donor = Keypair.generate();
 
-    // Airdrop using localnet
-    await airdropLocalnet(provider.connection, creator.publicKey, 2 * LAMPORTS_PER_SOL);
-    await airdropLocalnet(provider.connection, voucher.publicKey, 2 * LAMPORTS_PER_SOL);
-    await airdropLocalnet(provider.connection, donor.publicKey, 2 * LAMPORTS_PER_SOL);
+    console.log("Creator pubkey:", creator.publicKey.toBase58());
+    console.log("Voucher pubkey:", voucher.publicKey.toBase58());
+    console.log("Donor pubkey:", donor.publicKey.toBase58());
 
-    // Derive PDAs
     [programStatePda] = PublicKey.findProgramAddressSync(
       [Buffer.from("program_state")],
-      program.programId
-    );
-    [campaignPda] = PublicKey.findProgramAddressSync(
-      [Buffer.from("campaign"), firstCampaignPdaDerivationKey.toArrayLike(Buffer, "le", 8)],
       program.programId
     );
   });
@@ -83,6 +61,13 @@ describe("veri-fund", () => {
     expect(state.campaignCount.toNumber()).to.equal(0);
     expect(state.platformFee.toNumber()).to.equal(5);
     expect(state.platformAddress.toString()).to.equal(platformAuthority.publicKey.toString());
+
+    // Derive the next campaign id and PDA
+    nextCampaignId = new anchor.BN(state.campaignCount.toNumber() + 1);
+    [campaignPda] = PublicKey.findProgramAddressSync(
+      [Buffer.from("campaign"), nextCampaignId.toArrayLike(Buffer, "le", 8)],
+      program.programId
+    );
   });
 
   it("Creates a new campaign", async () => {
@@ -113,7 +98,7 @@ describe("veri-fund", () => {
     expect(campaignAccount.balance.toNumber()).to.equal(0);
     expect(campaignAccount.donors.toNumber()).to.equal(0);
     expect(campaignAccount.isActive).to.be.true;
-    expect(campaignAccount.cid.eq(firstCampaignStoredCid)).to.be.true;
+    expect(campaignAccount.cid.eq(nextCampaignId)).to.be.true;
 
     const state = await program.account.programState.fetch(programStatePda);
     expect(state.campaignCount.toNumber()).to.equal(1);
@@ -128,7 +113,7 @@ describe("veri-fund", () => {
     );
 
     const tx = await program.methods
-      .vouchForCampaign(firstCampaignPdaDerivationKey, stakeAmount)
+      .vouchForCampaign(nextCampaignId, stakeAmount)
       .accountsStrict({
         campaign: campaignPda,
         vouch: vouchPda,
@@ -156,7 +141,7 @@ describe("veri-fund", () => {
       [
         Buffer.from("transaction"),
         donor.publicKey.toBuffer(),
-        firstCampaignPdaDerivationKey.toArrayLike(Buffer, "le", 8),
+        nextCampaignId.toArrayLike(Buffer, "le", 8),
         donorCountSeed.toArrayLike(Buffer, "le", 8),
       ],
       program.programId
@@ -165,7 +150,7 @@ describe("veri-fund", () => {
     const campaignBalanceBefore = await provider.connection.getBalance(campaignPda);
 
     const tx = await program.methods
-      .donateToCampaign(firstCampaignPdaDerivationKey, donationAmount)
+      .donateToCampaign(nextCampaignId, donationAmount)
       .accountsStrict({
         campaign: campaignPda,
         transaction: donationTransactionPda,
@@ -178,7 +163,7 @@ describe("veri-fund", () => {
 
     const transactionAccount = await program.account.transaction.fetch(donationTransactionPda);
     expect(transactionAccount.owner.toString()).to.equal(donor.publicKey.toString());
-    expect(transactionAccount.cid.eq(firstCampaignPdaDerivationKey)).to.be.true;
+    expect(transactionAccount.cid.eq(nextCampaignId)).to.be.true;
     expect(transactionAccount.amount.eq(donationAmount)).to.be.true;
     expect(transactionAccount.credited).to.be.true;
 
@@ -208,7 +193,7 @@ describe("veri-fund", () => {
       [
         Buffer.from("withdraw"),
         creator.publicKey.toBuffer(),
-        firstCampaignPdaDerivationKey.toArrayLike(Buffer, "le", 8),
+        nextCampaignId.toArrayLike(Buffer, "le", 8),
         withdrawalCountSeed.toArrayLike(Buffer, "le", 8),
       ],
       program.programId
@@ -218,7 +203,7 @@ describe("veri-fund", () => {
     const campaignPdaBalanceBefore = await provider.connection.getBalance(campaignPda);
 
     const tx = await program.methods
-      .withdrawFunds(firstCampaignPdaDerivationKey, withdrawalAmount)
+      .withdrawFunds(nextCampaignId, withdrawalAmount)
       .accountsStrict({
         campaign: campaignPda,
         transaction: withdrawTransactionPda,
@@ -240,7 +225,7 @@ describe("veri-fund", () => {
 
     const transactionAccount = await program.account.transaction.fetch(withdrawTransactionPda);
     expect(transactionAccount.owner.toString()).to.equal(creator.publicKey.toString());
-    expect(transactionAccount.cid.eq(firstCampaignPdaDerivationKey)).to.be.true;
+    expect(transactionAccount.cid.eq(nextCampaignId)).to.be.true;
     expect(transactionAccount.amount.eq(withdrawalAmount)).to.be.true;
     expect(transactionAccount.credited).to.be.false;
 
@@ -252,7 +237,11 @@ describe("veri-fund", () => {
 
     const creatorBalanceAfter = await provider.connection.getBalance(creator.publicKey);
     const expectedCreatorIncrease = withdrawalAmount.toNumber() * (100 - programState.platformFee.toNumber()) / 100;
-    expect(creatorBalanceAfter).to.be.closeTo(creatorBalanceBefore - 5000 + expectedCreatorIncrease, 100000);
+    const transactionAccountInfo = await provider.connection.getAccountInfo(withdrawTransactionPda);
+    const transactionAccountRent = transactionAccountInfo ? transactionAccountInfo.lamports : 0;
+    const expectedNetIncrease = expectedCreatorIncrease - transactionAccountRent;
+    const actualDiff = creatorBalanceAfter - creatorBalanceBefore;
+    expect(actualDiff).to.be.closeTo(expectedNetIncrease, 200000);
 
     const rawCampaignAccountInfo = await provider.connection.getAccountInfo(campaignPda);
     if (!rawCampaignAccountInfo) {

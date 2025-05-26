@@ -1,11 +1,12 @@
 [toolchain]
 anchor_version = "0.31.1"
+
 [features]
 resolution = true
 skip-lint = false
 
 [programs.localnet]
-veri_fund = "Ai8JfY6X3b65SdbFYjpTyXfPtkNCgoEnQv2HpnBWFhcn"
+veri_fund = "8xHxSZahioqDShhXYBT3pATqRXAYTxrWdtqowVoDPP1j"
 
 [registry]
 url = "https://api.apr.dev"

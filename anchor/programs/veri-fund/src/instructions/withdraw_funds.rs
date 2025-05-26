@@ -1,6 +1,5 @@
 #![allow(unexpected_cfgs)]
 use anchor_lang::prelude::*;
-use anchor_lang::system_program;
 
 use crate::error::ErrorCode;
 use crate::state::{Campaign, ProgramState, Transaction};
@@ -67,27 +66,13 @@ pub fn withdraw_funds(ctx: Context<WithdrawFunds>, cid: u64, amount: u64) -> Res
     let platform_fee = amount * program_state.platform_fee / 100;
     let creator_amount = amount - platform_fee;
 
-    system_program::transfer(
-        CpiContext::new(
-            ctx.accounts.system_program.to_account_info(),
-            system_program::Transfer {
-                from: campaign.to_account_info(),
-                to: creator.to_account_info(),
-            },
-        ),
-        creator_amount,
-    )?;
+    // Transfer to creator
+    **campaign.to_account_info().try_borrow_mut_lamports()? -= creator_amount;
+    **creator.to_account_info().try_borrow_mut_lamports()? += creator_amount;
 
-    system_program::transfer(
-        CpiContext::new(
-            ctx.accounts.system_program.to_account_info(),
-            system_program::Transfer {
-                from: campaign.to_account_info(),
-                to: platform_account_info.to_account_info(),
-            },
-        ),
-        platform_fee,
-    )?;
+    // Transfer to platform
+    **campaign.to_account_info().try_borrow_mut_lamports()? -= platform_fee;
+    **platform_account_info.try_borrow_mut_lamports()? += platform_fee;
 
     campaign.withdrawals_total += amount;
     campaign.balance -= amount;

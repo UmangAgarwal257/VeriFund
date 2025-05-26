@@ -10,7 +10,7 @@ pub use constants::*;
 use instructions::*;
 pub use state::*;
 
-declare_id!("Ai8JfY6X3b65SdbFYjpTyXfPtkNCgoEnQv2HpnBWFhcn");
+declare_id!("8xHxSZahioqDShhXYBT3pATqRXAYTxrWdtqowVoDPP1j");
 
 #[program]
 pub mod veri_fund {

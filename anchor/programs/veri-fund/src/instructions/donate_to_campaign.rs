@@ -44,7 +44,7 @@ pub fn donate_to_campaign(ctx: Context<DonateToCampaign>, cid: u64, amount: u64)
     require!(campaign.is_active, ErrorCode::CampaignNotActive);
     require!(amount > 0, ErrorCode::InvalidDonationAmount);
     require!(
-        campaign.goal <= campaign.amount_raised,
+        campaign.goal > campaign.amount_raised,
         ErrorCode::CampaignGoalActualized
     );
 
