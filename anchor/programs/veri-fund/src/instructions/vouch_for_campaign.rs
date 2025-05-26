@@ -5,9 +5,10 @@ use crate::error::ErrorCode;
 use crate::state::{Campaign, Vouch};
 
 #[derive(Accounts)]
+#[instruction(cid: u64, stake_amount: u64)]
 pub struct VouchForCampaign<'info> {
     #[account(
-        seeds = [b"campaign", campaign.cid.to_le_bytes().as_ref()],
+        seeds = [b"campaign", cid.to_le_bytes().as_ref()],
         bump,
     )]
     pub campaign: Account<'info, Campaign>,
@@ -26,7 +27,11 @@ pub struct VouchForCampaign<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn vouch_for_campaign(ctx: Context<VouchForCampaign>, stake_amount: u64) -> Result<()> {
+pub fn vouch_for_campaign(
+    ctx: Context<VouchForCampaign>,
+    _cid: u64,
+    stake_amount: u64,
+) -> Result<()> {
     let campaign = &ctx.accounts.campaign;
     let vouch = &mut ctx.accounts.vouch;
     let voucher = &ctx.accounts.voucher;

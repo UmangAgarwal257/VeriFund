@@ -46,7 +46,7 @@ pub fn create_campaign(
     let timestamp = Clock::get()?.unix_timestamp;
     let deadline = timestamp + (30 * 24 * 60 * 60); // 30 days from now
 
-    campaign.cid = program_state.campaign_count;
+    campaign.cid = program_state.campaign_count + 1;
     campaign.creator = creator.key();
     campaign.title = title;
     campaign.description = description;

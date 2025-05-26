@@ -30,8 +30,12 @@ pub mod veri_fund {
         create_campaign::create_campaign(ctx, title, description, image_url, goal)
     }
 
-    pub fn vouch_for_campaign(ctx: Context<VouchForCampaign>, stake_amount: u64) -> Result<()> {
-        vouch_for_campaign::vouch_for_campaign(ctx, stake_amount)
+    pub fn vouch_for_campaign(
+        ctx: Context<VouchForCampaign>,
+        cid: u64,
+        stake_amount: u64,
+    ) -> Result<()> {
+        vouch_for_campaign::vouch_for_campaign(ctx, cid, stake_amount)
     }
 
     pub fn donate_to_campaign(ctx: Context<DonateToCampaign>, cid: u64, amount: u64) -> Result<()> {
