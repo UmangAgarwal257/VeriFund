@@ -11,7 +11,7 @@ veri_fund = "Ai8JfY6X3b65SdbFYjpTyXfPtkNCgoEnQv2HpnBWFhcn"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
+cluster = "devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
