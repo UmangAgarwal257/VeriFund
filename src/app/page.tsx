@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Shield, Users, TrendingUp, CheckCircle, ArrowRight, Vote, Clock, Coins } from "lucide-react"
+import { Handshake, Users, TrendingUp, CheckCircle, ArrowRight, Vote, Clock, Coins } from "lucide-react"
 import Link from "next/link"
 
 export default function VeriFundLanding() {
@@ -11,18 +11,18 @@ export default function VeriFundLanding() {
       <header className="px-4 lg:px-6 h-16 flex items-center border-b border-gray-800 bg-black/80 backdrop-blur-sm sticky top-0 z-50">
         <Link href="/" className="flex items-center justify-center">
           <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-lg flex items-center justify-center">
-            <Shield className="h-5 w-5 text-black" />
+            <Handshake className="h-5 w-5 text-black" />
           </div>
           <span className="ml-2 text-xl font-bold">VeriFund</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link href="#features" className="text-sm font-medium hover:text-emerald-400 transition-colors">
+          <Link href="#features" className="pt-2 text-sm font-medium hover:text-emerald-400 transition-colors">
             Features
           </Link>
-          <Link href="#how-it-works" className="text-sm font-medium hover:text-emerald-400 transition-colors">
+          <Link href="#how-it-works" className="pt-2 text-sm font-medium hover:text-emerald-400 transition-colors">
             How It Works
           </Link>
-          <Link href="#projects" className="text-sm font-medium hover:text-emerald-400 transition-colors">
+          <Link href="#projects" className="pt-2 text-sm font-medium hover:text-emerald-400 transition-colors">
             Projects
           </Link>
           <Button variant="outline" size="sm" className="border-emerald-500/50 bg-transparent text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300">
@@ -124,7 +124,7 @@ export default function VeriFundLanding() {
                 <div className="space-y-6">
                   <div className="flex gap-4">
                     <div className="w-12 h-12 bg-emerald-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Shield className="h-6 w-6 text-emerald-400" />
+                      <Handshake className="h-6 w-6 text-emerald-400" />
                     </div>
                     <div>
                       <h3 className="font-semibold mb-2 text-white">Community Verification</h3>
@@ -210,7 +210,7 @@ export default function VeriFundLanding() {
               <Card className="bg-gray-800 border-gray-700 hover:border-emerald-500/50 transition-all duration-300">
                 <CardHeader className="pb-3">
                   <div className="w-full h-40 bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 rounded-lg flex items-center justify-center">
-                    <Shield className="h-12 w-12 text-emerald-400" />
+                    <Handshake className="h-12 w-12 text-emerald-400" />
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -288,7 +288,7 @@ export default function VeriFundLanding() {
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded flex items-center justify-center">
-                  <Shield className="h-4 w-4 text-black" />
+                  <Handshake className="h-4 w-4 text-black" />
                 </div>
                 <span className="font-bold">VeriFund</span>
               </div>
