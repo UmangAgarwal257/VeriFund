@@ -50,13 +50,15 @@ export default function VeriFundLanding() {
                 A crowdfunding platform where community members vouch for projects before they go live. No more scams, no more broken promises.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button
-                  size="lg"
-                  className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-black font-semibold"
-                >
-                  Explore Projects
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                <Link href="/projects">
+                  <Button
+                    size="lg"
+                    className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-black font-semibold w-full"
+                  >
+                    Explore Projects
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
                 <Button variant="outline" size="lg" className="border-emerald-500/50 bg-transparent text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300">
                   Submit Your Project
                 </Button>
@@ -263,13 +265,15 @@ export default function VeriFundLanding() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button
-                  size="lg"
-                  className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-black font-semibold"
-                >
-                  Start Exploring
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                <Link href="/projects">
+                  <Button
+                    size="lg"
+                    className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-black font-semibold w-full"
+                  >
+                    Start Exploring
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
                 <Button variant="outline" size="lg" className="border-emerald-500/50 bg-transparent text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300">
                   Submit Your Project
                 </Button>
@@ -342,7 +346,7 @@ export default function VeriFundLanding() {
           </div>
 
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-500">
-            © 2024 VeriFund. Building trust in crowdfunding.
+            © 2025 VeriFund. Building trust in crowdfunding.
           </div>
         </div>
       </footer>
