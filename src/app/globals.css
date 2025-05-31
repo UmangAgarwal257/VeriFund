@@ -120,3 +120,21 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Wallet adapter styles */
+.wallet-adapter-button {
+  background-color: transparent !important;
+  border: 1px solid rgba(16, 185, 129, 0.5) !important;
+  color: rgb(52, 211, 153) !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.wallet-adapter-button:hover {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+  color: rgb(110, 231, 183) !important;
+}
+
+.wallet-adapter-modal {
+  background-color: rgb(17 24 39) !important;
+  border: 1px solid rgb(55 65 81) !important;
+}

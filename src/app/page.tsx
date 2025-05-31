@@ -22,7 +22,7 @@ export default function VeriFundLanding() {
           <Link href="#how-it-works" className="pt-2 text-sm font-medium hover:text-emerald-400 transition-colors">
             How It Works
           </Link>
-          <Link href="#projects" className="pt-2 text-sm font-medium hover:text-emerald-400 transition-colors">
+          <Link href="/projects" className="pt-2 text-sm font-medium hover:text-emerald-400 transition-colors">
             Projects
           </Link>
           <Button variant="outline" size="sm" className="border-emerald-500/50 bg-transparent text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300">
@@ -53,7 +53,7 @@ export default function VeriFundLanding() {
                 <Link href="/projects">
                   <Button
                     size="lg"
-                    className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-black font-semibold w-full"
+                    className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-black font-semibold w-full hover:cursor-pointer"
                   >
                     Explore Projects
                     <ArrowRight className="ml-2 h-4 w-4" />

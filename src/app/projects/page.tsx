@@ -397,7 +397,7 @@ export default function ProjectsPage() {
         {/* Projects Grid - Sorted by Ranking */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {sortedProjects.map((project, index) => (
-            <Link key={project.cid} href={`/project/${project.cid}`}>
+            <Link key={project.cid} href={`/projects/${project.cid}`}>
               <ProjectCard project={project} rank={index + 1} />
             </Link>
           ))}
