@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Handshake, Search,  Users, Clock, TrendingUp, Star, Shield } from "lucide-react"
 import Link from "next/link"
+import { SolToUsdDisplay } from "@/components/SolPriceDisplay"
 
 
 const mockProjects = [
@@ -377,6 +378,13 @@ export default function ProjectsPage() {
           <div className="bg-gray-800/50 rounded-lg p-4 text-center">
             <div className="text-2xl font-bold text-emerald-400">
               {formatSol(sortedProjects.reduce((sum, p) => sum + p.amountRaised, 0))}
+            </div>
+            <div className="text-xs text-emerald-300/70 mt-1">
+              <SolToUsdDisplay 
+                solAmount={lamportsToSol(sortedProjects.reduce((sum, p) => sum + p.amountRaised, 0))}
+                showSolAmount={false}
+                className="text-emerald-300/70"
+              />
             </div>
             <div className="text-sm text-gray-400">Total Raised</div>
           </div>

@@ -8,6 +8,8 @@ import { Progress } from "@/components/ui/progress"
 import { Handshake, Users,CheckCircle, Star, Shield, ArrowLeft, ExternalLink, Calendar, MapPin, Award, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import { SolToUsdDisplay, SolPriceIndicator } from "@/components/SolPriceDisplay"
+import { useState } from "react"
 
 // Mock project data - in real app, this would come from your Solana program
 const mockProject = {
@@ -105,13 +107,18 @@ Each system can serve a community of 500-1000 people, providing reliable access 
 };
 
 // Utility functions
-const lamportsToSol = (lamports: number) => lamports / 1000000000;
+const LAMPORTS_PER_SOL = 1_000_000_000n;
+const lamportsToSol = (lamports: bigint | number) =>
+  Number((typeof lamports === "bigint" ? lamports : BigInt(lamports)) / LAMPORTS_PER_SOL);
 const formatSol = (lamports: number) => `${lamportsToSol(lamports).toFixed(1)} SOL`;
 const formatDaysLeft = (deadline: number) => Math.max(0, Math.ceil((deadline - Date.now()) / (24 * 60 * 60 * 1000)));
 const formatDate = (timestamp: number) => new Date(timestamp).toLocaleDateString();
 
 
 export default function ProjectPage() {
+  const [fundingAmount, setFundingAmount] = useState('');
+  const [fundingMessage, setFundingMessage] = useState('');
+  
   // In real app, fetch project data based on params.id
   const project = mockProject;
   
@@ -119,7 +126,10 @@ export default function ProjectPage() {
     notFound();
   }
 
-  const progressPercentage = (project.amountRaised / project.goal) * 100;
+  const progressPercentage = Math.min(
+  100,
+  (project.amountRaised / project.goal) * 100,
+);
   const daysLeft = formatDaysLeft(project.deadline);
   const currentMilestone = project.milestones.find(m => m.isActive) || project.milestones.find(m => !m.isCompleted);
 
@@ -250,9 +260,18 @@ export default function ProjectPage() {
                         <div className="flex-1 space-y-2">
                           <div className="flex items-center justify-between">
                             <h4 className="font-semibold text-white">{milestone.title}</h4>
-                            <span className="text-sm text-gray-400">
-                              {formatSol(milestone.targetAmount)} target
-                            </span>
+                            <div className="text-right">
+                              <span className="text-sm text-gray-400">
+                                {formatSol(milestone.targetAmount)} target
+                              </span>
+                              <div className="text-xs text-gray-500">
+                                <SolToUsdDisplay 
+                                  solAmount={lamportsToSol(milestone.targetAmount)}
+                                  showSolAmount={false}
+                                  className="text-gray-500"
+                                />
+                              </div>
+                            </div>
                           </div>
                           
                           <p className="text-gray-400">{milestone.description}</p>
@@ -260,7 +279,9 @@ export default function ProjectPage() {
                           {milestone.isCompleted && milestone.evidence && (
                             <div className="bg-emerald-500/10 border border-emerald-500/20 rounded p-3">
                               <div className="text-sm text-emerald-400 font-medium mb-1">
-                                Completed {formatDate(milestone.completedAt!)}
+                                Completed {milestone.completedAt
+  ? formatDate(milestone.completedAt)
+  : "Date N/A"}
                               </div>
                               <div className="text-sm text-gray-300">{milestone.evidence}</div>
                             </div>
@@ -279,8 +300,8 @@ export default function ProjectPage() {
               </TabsContent>
 
               <TabsContent value="vouchers" className="space-y-4">
-                {project.vouchers.map((voucher, index) => (
-                  <Card key={index} className="bg-gray-800 border-gray-700">
+{project.vouchers.map((voucher) => (
+  <Card key={voucher.address} className="bg-gray-800 border-gray-700">
                     <CardContent className="p-6">
                       <div className="flex items-start gap-4">
                         <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-full flex items-center justify-center">
@@ -353,6 +374,19 @@ export default function ProjectPage() {
                     </span>
                   </div>
                   
+                  <div className="flex justify-between text-xs text-gray-500">
+                    <SolToUsdDisplay 
+                      solAmount={lamportsToSol(project.amountRaised)}
+                      showSolAmount={false}
+                      className="text-emerald-300/70"
+                    />
+                    <SolToUsdDisplay 
+                      solAmount={lamportsToSol(project.goal)}
+                      showSolAmount={false}
+                      className="text-gray-400"
+                    />
+                  </div>
+                  
                   <Progress value={progressPercentage} className="h-3" />
                   
                   <div className="text-sm text-center text-gray-400">
@@ -379,6 +413,13 @@ export default function ProjectPage() {
                     <div className="text-sm text-white">{currentMilestone.title}</div>
                     <div className="text-xs text-gray-400 mt-1">
                       Target: {formatSol(currentMilestone.targetAmount)}
+                      <span className="ml-2">
+                        (<SolToUsdDisplay 
+                          solAmount={lamportsToSol(currentMilestone.targetAmount)}
+                          showSolAmount={false}
+                          className="text-gray-500"
+                        />)
+                      </span>
                     </div>
                   </div>
                 )}
@@ -386,20 +427,36 @@ export default function ProjectPage() {
                 {/* Funding Form */}
                 <div className="space-y-4 pt-4 border-t border-gray-700">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Amount (SOL)</label>
+                    <div className="flex justify-between items-center">
+                      <label className="text-sm font-medium">Amount (SOL)</label>
+                      <SolPriceIndicator className="text-xs" />
+                    </div>
                     <Input 
                       placeholder="0.1" 
                       type="number" 
                       min="0.01" 
                       step="0.01"
+                      value={fundingAmount}
+                      onChange={(e) => setFundingAmount(e.target.value)}
                       className="bg-gray-700 border-gray-600 text-white"
                     />
+                    {fundingAmount && parseFloat(fundingAmount) > 0 && (
+                      <div className="text-xs text-gray-500">
+                        <SolToUsdDisplay 
+                          solAmount={parseFloat(fundingAmount)}
+                          showSolAmount={false}
+                          className="text-emerald-300/70"
+                        />
+                      </div>
+                    )}
                   </div>
                   
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Message (Optional)</label>
                     <Textarea 
                       placeholder="Leave a message for the creator..."
+                      value={fundingMessage}
+                      onChange={(e) => setFundingMessage(e.target.value)}
                       className="bg-gray-700 border-gray-600 text-white resize-none"
                       rows={3}
                     />
@@ -439,9 +496,18 @@ export default function ProjectPage() {
                 
                 <div className="flex items-center justify-between">
                   <span className="text-gray-400">Total Staked</span>
-                  <span className="font-semibold text-emerald-400">
-                    {formatSol(project.totalStaked)}
-                  </span>
+                  <div className="text-right">
+                    <span className="font-semibold text-emerald-400">
+                      {formatSol(project.totalStaked)}
+                    </span>
+                    <div className="text-xs text-gray-500">
+                      <SolToUsdDisplay 
+                        solAmount={lamportsToSol(project.totalStaked)}
+                        showSolAmount={false}
+                        className="text-gray-500"
+                      />
+                    </div>
+                  </div>
                 </div>
                 
                 <div className="flex items-center justify-between">
