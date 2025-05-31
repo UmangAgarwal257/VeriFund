@@ -10,55 +10,59 @@ interface SolToUsdProps {
 }
 
 export function SolToUsdDisplay({ 
-  solAmount, 
-  className = "", 
-  showSolAmount = true,
-  precision = 2 
+    solAmount, 
+    className = "", 
+    showSolAmount = true,
+    precision = 2 
 }: SolToUsdProps) {
-  const { price: solPrice, loading, error } = useSolPrice();
+    const { price: solPrice, loading, error } = useSolPrice();
 
-  if (loading) {
+    if (loading) {
+        return (
+            <span className={`text-gray-500 ${className}`}>
+                {showSolAmount && `${solAmount.toFixed(precision)} SOL`} (Converting...)
+            </span>
+        );
+    }
+
+    if (error || !solPrice) {
+        const FALLBACK_SOL_PRICE = process.env.NEXT_PUBLIC_SOL_USD_FALLBACK 
+            ? parseFloat(process.env.NEXT_PUBLIC_SOL_USD_FALLBACK) || 100 
+            : 100;
+
+        return (
+            <span className={`text-gray-500 ${className}`}>
+                {showSolAmount && `${solAmount.toFixed(precision)} SOL`} (≈ ${solToUsd(solAmount, FALLBACK_SOL_PRICE)} USD)
+            </span>
+        );
+    }
+
     return (
-      <span className={`text-gray-500 ${className}`}>
-        {showSolAmount && `${solAmount.toFixed(precision)} SOL`} (Converting...)
-      </span>
+        <span className={className}>
+            {showSolAmount && `${solAmount.toFixed(precision)} SOL`}
+            {showSolAmount && " "}(≈ ${solToUsd(solAmount, solPrice)} USD)
+        </span>
     );
-  }
-
-  if (error || !solPrice) {
-    return (
-      <span className={`text-gray-500 ${className}`}>
-        {showSolAmount && `${solAmount.toFixed(precision)} SOL`} (≈ ${solToUsd(solAmount, 100)} USD)
-      </span>
-    );
-  }
-
-  return (
-    <span className={className}>
-      {showSolAmount && `${solAmount.toFixed(precision)} SOL`}
-      {showSolAmount && " "}(≈ ${solToUsd(solAmount, solPrice)} USD)
-    </span>
-  );
 }
 
 interface SolPriceIndicatorProps {
-  className?: string;
+    className?: string;
 }
 
 export function SolPriceIndicator({ className = "" }: SolPriceIndicatorProps) {
-  const { price: solPrice, loading, error } = useSolPrice();
+    const { price: solPrice, loading, error } = useSolPrice();
 
-  if (loading) {
-    return <span className={`text-gray-500 ${className}`}>Loading SOL price...</span>;
-  }
+    if (loading) {
+        return <span className={`text-gray-500 ${className}`}>Loading SOL price...</span>;
+    }
 
-  if (error || !solPrice) {
-    return <span className={`text-gray-500 ${className}`}>SOL price unavailable</span>;
-  }
+    if (error || !solPrice) {
+        return <span className={`text-gray-500 ${className}`}>SOL price unavailable</span>;
+    }
 
-  return (
-    <span className={`text-gray-400 ${className}`}>
-      1 SOL ≈ ${solPrice.toFixed(2)} USD
-    </span>
-  );
+    return (
+        <span className={`text-gray-400 ${className}`}>
+            1 SOL ≈ ${solPrice.toFixed(2)} USD
+        </span>
+    );
 }

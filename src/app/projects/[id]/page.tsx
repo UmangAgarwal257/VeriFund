@@ -109,7 +109,7 @@ Each system can serve a community of 500-1000 people, providing reliable access 
 // Utility functions
 const LAMPORTS_PER_SOL = 1_000_000_000n;
 const lamportsToSol = (lamports: bigint | number) =>
-  Number((typeof lamports === "bigint" ? lamports : BigInt(lamports)) / LAMPORTS_PER_SOL);
+  Number(typeof lamports === "bigint" ? lamports : BigInt(lamports)) / Number(LAMPORTS_PER_SOL);
 const formatSol = (lamports: number) => `${lamportsToSol(lamports).toFixed(1)} SOL`;
 const formatDaysLeft = (deadline: number) => Math.max(0, Math.ceil((deadline - Date.now()) / (24 * 60 * 60 * 1000)));
 const formatDate = (timestamp: number) => new Date(timestamp).toLocaleDateString();

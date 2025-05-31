@@ -175,7 +175,7 @@ export default function CreateProjectPage() {
         return;
       }
 
-      const nextCampaignId = programState.campaignCount + 1;
+      const nextCampaignId = programState.campaignCount.toNumber() + 1;
       const campaignPda = getCampaignPda(nextCampaignId);
 
       console.log('Creating campaign:', {

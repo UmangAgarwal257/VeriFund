@@ -87,7 +87,7 @@ export default function WalletTestPage() {
                 console.error('Invalid amount');
                 return;
             }
-            const lamports = numericAmount * LAMPORTS_PER_SOL;
+           const lamports = Math.round(numericAmount * LAMPORTS_PER_SOL);
             
             const transaction = new Transaction().add(
                 SystemProgram.transfer({
